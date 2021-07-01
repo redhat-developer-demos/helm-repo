@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: netcandystore
+  labels:
+    {{- include "netcandystore.labels" . | nindent 4 }}
+    app: netcandystore
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: netcandystore
+  type: ClusterIP

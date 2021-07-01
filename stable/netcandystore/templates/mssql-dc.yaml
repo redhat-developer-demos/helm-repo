@@ -1,0 +1,79 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  annotations:
+    description: Defines how to deploy the database server
+  name: mssql
+  labels:
+    {{- include "netcandystore.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    name: mssql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "netcandystore.selectorLabels" . | nindent 8 }}
+        name: mssql
+      name: mssql
+    spec:
+      containers:
+      - env:
+        - name: ACCEPT_EULA
+          value: "Y"
+        - name: MSSQL_PID
+          value: Developer
+        - name: SA_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: SA_PASSWORD
+              name: mssql-secret
+        - name: MSSQL_SERVICE
+          valueFrom:
+            secretKeyRef:
+              key: SERVICE_NAME
+              name: mssql-secret
+        image: {{ .Values.netcandy.dbimage }}
+        name: db
+        ports:
+        - containerPort: 1433
+        volumeMounts:
+        - mountPath: /var/opt/mssql
+          name: mssql-data
+        - mountPath: /tmp
+          name: tempdir
+      initContainers:
+      - name: csv-downloader
+        image: registry.access.redhat.com/ubi8/ubi:latest
+        env:
+        - name: URLPREFIX
+          value: "https://raw.githubusercontent.com/DonSchenck/NetCandyStore/main"
+        command:
+        - /bin/bash
+        - -c
+        - |
+          url=${URLPREFIX}
+          csvfiles=(StatusCodes.csv ProductCategories.csv Products.csv)
+          echo "Downloading CSV files"
+          echo "====================="
+          for csvfile in ${csvfiles[@]}
+          do
+            curl ${url}/${csvfile} --output /tmp/${csvfile}
+            chmod 777 /tmp/${csvfile}
+          done
+        imagePullPolicy: Always
+        volumeMounts:
+        - mountPath: /tmp
+          name: tempdir
+      volumes:
+      - name: mssql-data
+        persistentVolumeClaim:
+          claimName: mssql-pvc
+      - name: tempdir
+        emptyDir: {}

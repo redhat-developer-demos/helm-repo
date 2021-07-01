@@ -1,0 +1,16 @@
+1. Get the application URL by running these commands:
+oc get route netcandystore -n {{ .Release.Namespace }} -o jsonpath='{.spec.host}{"\n"}'
+
+2. NOTE: The Windows container deployed only supports the following OS:
+
+Windows Version:
+=============
+Windows Server 2019 Release 1809
+
+Build Version:
+=============
+
+Major  Minor  Build  Revision
+-----  -----  -----  --------
+10     0      17763  0 
+

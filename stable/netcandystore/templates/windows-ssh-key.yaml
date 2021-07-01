@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  creationTimestamp: null
+  name: windows-ssh-key
+  labels:
+    {{- include "netcandystore.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: pre-install
+    helm.sh/hook-weight: "0"
+data:
+  private-key.pem: {{ required "A valid .Values.ssh.hostkey entry required!" .Values.ssh.hostkey }}

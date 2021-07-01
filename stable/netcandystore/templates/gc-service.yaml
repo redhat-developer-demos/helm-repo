@@ -1,0 +1,18 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: getcategories
+  labels:
+    {{- include "netcandystore.labels" . | nindent 4 }}
+    app: getcategories
+spec:
+  ports:
+    - name: 8080-tcp
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: getcategories
+    deploymentconfig: getcategories
+status:
+  loadBalancer: {}

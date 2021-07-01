@@ -1,0 +1,35 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: netcandystore-db-bootstrapper 
+  labels:
+    {{- include "netcandystore.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: post-install
+    helm.sh/hook-weight: "0"
+spec:
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "netcandystore.selectorLabels" . | nindent 8 }}
+    spec:
+      restartPolicy: Never
+      containers:
+      - command:
+        - /bin/bash
+        - -c
+        - |
+          /usr/local/bin/bootstrapdb.sh
+        image: quay.io/redhatworkshops/netcandystore-db-bootstrapper:latest
+        name: netcandystore-db-bootstrapper
+        env:
+        - name: URLPREFIX
+          value: "https://raw.githubusercontent.com/DonSchenck/NetCandyStore/main"
+        - name: DBPASS
+          value: {{ .Values.netcandy.dbpassword | quote }}
+        - name: DBHOST
+          value: "mssql"

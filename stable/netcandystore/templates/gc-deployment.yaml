@@ -1,0 +1,35 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: getcategories
+  labels:
+    {{- include "netcandystore.labels" . | nindent 4 }}
+    app: getcategories
+spec:
+  replicas: {{ .Values.backend.replicas }}
+  selector:
+    matchLabels:
+      app: getcategories
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "netcandystore.selectorLabels" . | nindent 8 }}
+        app: getcategories
+        deploymentconfig: getcategories
+    spec:
+      containers:
+        - name: getcategories
+          image: >-
+            quay.io/donschenck/getcategories@sha256:c8f3026ee6f88299580ffac278d0190926634a045985f47728ae051e4bca0c90
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          env:
+            - name: DBConnectionString
+              value: >-
+                Server=mssql;Initial Catalog=CandiesDB;Persist Security
+                Info=False;User ID=sa;Password={{ .Values.netcandy.dbpassword }};

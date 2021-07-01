@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: netcandystore
+    {{- include "netcandystore.labels" . | nindent 4 }}
+  name: netcandystore
+spec:
+  selector:
+    matchLabels:
+      app: netcandystore
+  replicas: {{ .Values.frontend.replicas }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "netcandystore.selectorLabels" . | nindent 8 }}
+        app: netcandystore
+      name: netcandystore
+    spec:
+      tolerations:
+      - key: "os"
+        value: "Windows"
+        effect: "NoSchedule"
+      containers:
+      - name: netcandystore
+        image: {{ .Values.netcandy.image | quote }}
+        env:
+          - name: categoriesMicroserviceURL
+            value: 'http://getcategories:8080/categories'
+        imagePullPolicy: Always
+        securityContext:
+          windowsOptions:
+            runAsUserName: "ContainerAdministrator"
+      nodeSelector:
+        beta.kubernetes.io/os: windows

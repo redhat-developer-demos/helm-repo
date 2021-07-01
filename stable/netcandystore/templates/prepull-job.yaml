@@ -1,0 +1,47 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: netcandystore-prepull-image
+  labels:
+    {{- include "netcandystore.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: pre-install
+    helm.sh/hook-weight: "1"
+spec:
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "netcandystore.selectorLabels" . | nindent 8 }}
+    spec:
+      restartPolicy: Never
+      containers:
+      - command:
+        - /bin/bash
+        - -c
+        - |
+          ssh ${SSHOPTS} -i /tmp/ssh/private-key.pem ${SSHUSR}@${SSHHOST} docker pull ${NCIMAGE}
+        image: quay.io/redhatworkshops/winc-ssh:latest
+        name: prepull-image
+        env:
+        - name: NCIMAGE
+          value: "{{ .Values.netcandy.image }}"
+        - name: SSHOPTS
+          value: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+        - name: SSHUSR
+          value: "{{ .Values.ssh.username }}"
+        - name: SSHHOST
+          value: {{ required "A valid .Values.ssh.hostname entry required!" .Values.ssh.hostname }}
+        volumeMounts:
+        - name: sshkey
+          mountPath: "/tmp/ssh"
+          readOnly: true
+        resources: {}
+      volumes:
+      - name: sshkey
+        secret:
+          secretName: windows-ssh-key
+          defaultMode: 0400

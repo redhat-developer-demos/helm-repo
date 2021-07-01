@@ -1,0 +1,17 @@
+{{- if .Values.route.enabled -}}
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: netcandystore
+  labels:
+    {{- include "netcandystore.labels" . | nindent 4 }}
+    app: netcandystore
+spec:
+  to:
+    kind: Service
+    name: netcandystore
+    weight: 100
+  port:
+    targetPort: 80
+  wildcardPolicy: None
+{{- end }}
