@@ -19,6 +19,20 @@ for more information.
 * OpenShift 4.7 or newer
 * Cluster Administrator access
 
+# Pre-Install Steps
+
+Add the repository.
+
+```shell
+helm repo add redhat-demos https://redhat-developer-demos.github.io/helm-repo
+```
+
+It's good to update all the definitions as well.
+
+```shell
+helm repo update
+```
+
 # Installing the Chart
 
 Users installing this chart must have Cluster Administrator permissions.
@@ -26,7 +40,7 @@ Users installing this chart must have Cluster Administrator permissions.
 To install the chart with the release name `my-release`:
 
 ```shell
-helm
+helm install my-release redhat-demos/openshift-cicd-demo
 ```
 
 # Post Installation
@@ -35,6 +49,21 @@ See the instructions (from NOTES.txt within chart) after the helm
 installation completes for information about the demo . The instruction can also
 be viewed by running the command: `helm status my-release`
 
+Verify that the demo was deployed by inspecting the deploy pod log:
+
+```shell
+oc logs openshift-cicd-demo-deployer -n ocp-cicd-deploy
+```
+
+> :rotating_light: **NOTE** It doesn't matter which namespace you deploy this helm chart.
+
+# Uninstalling the Chart
+
+To uninstall/delete the (for example `my-release`) deployment:
+
+```shell
+helm uninstall my-release
+```
 
 # Configuration
 
