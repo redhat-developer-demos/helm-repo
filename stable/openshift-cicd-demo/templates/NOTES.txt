@@ -1,0 +1,63 @@
+0. Installation
+
+View the installation status by running:
+
+	oc logs -f openshift-cicd-demo-deployer -n ocp-cicd-deploy
+
+
+This will show you the status of the install.
+
+1. The Console
+--------------
+
+Route can be found by running:
+
+	kubectl get route console -n openshift-console -o jsonpath='{.spec.host}{"\n"}'
+
+The creds for the demo are:
+
+  username: developer
+  password: openshift
+
+2. The tenant Argo CD
+---------------------
+
+Instance is running in the welcome-gitops namespace:
+
+	kubectl get route welcome-argocd-server -n welcome-gitops -o jsonpath='{.spec.host}{"\n"}'
+
+The password can be extracted with oc:
+
+	oc extract secret/welcome-argocd-cluster -n welcome-gitops --to=-
+
+3. GitTea Service
+-----------------
+
+It can be found by running the following:
+
+	kubectl get route gitea -n scm -o jsonpath='{.spec.host}{"\n"}'
+
+The creds for the demo are:
+
+  username: developer
+  password: openshift
+
+Admin user (if you need it):
+
+  username: gitea-admin
+  password: openshift
+
+4. The Sample Application
+-------------------------
+
+The application is deployed to two namespaces; welcome-dev and welcome-prod
+
+You can find the routes using the following:
+
+Dev
+
+	kubectl get route welcome-app -n welcome-dev -o jsonpath='{.spec.host}{"\n"}'
+
+Prod
+
+	kubectl get route welcome-app -n welcome-prod -o jsonpath='{.spec.host}{"\n"}'

@@ -1,0 +1,3 @@
+timeoutoptions:
+  sleep: 5
+  threshold: 60
