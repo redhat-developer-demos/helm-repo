@@ -20,6 +20,7 @@ spec:
           export HOME=/tmp/looper
           ## oAuth is a bitch so we'll turn off
           ## automatic sync and patch the servivce before we do anything else
+          oc patch applicationsets cicd-demo -n openshift-gitops --type=json -p='[{"op": "replace", "path": "/spec/template/spec/syncPolicy/automated/selfHeal", "value":false}]'
           oc patch application cluster-config -n openshift-gitops --type=merge --patch '{"spec":{"syncPolicy":{"automated":{"selfHeal":false}}}}'
           ## delete the secret
           oc delete secret htpass-secret -n openshift-config
@@ -30,6 +31,8 @@ spec:
           do
             oc delete application ${wapp} -n welcome-gitops
           done
+          ## Delete the cluster application sets
+          oc delete applicationsets cicd-demo -n openshift-gitops
           ## Delete the cluster app
           for capp in tekton gitea argocd cluster-config
           do
@@ -47,6 +50,7 @@ spec:
           do
             oc delete operator ${op}
           done
+          oc delete project openshift-gitops
           ## Exit 0 because we have to
           exit 0
       imagePullPolicy: Always
