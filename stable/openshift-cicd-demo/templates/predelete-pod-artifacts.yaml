@@ -18,6 +18,13 @@ spec:
         - -c
         - |
           export HOME=/tmp/looper
+          ## oAuth is a bitch so we'll turn off
+          ## automatic sync and patch the servivce before we do anything else
+          oc patch application cluster-config -n openshift-gitops --type=merge --patch '{"spec":{"syncPolicy":{"automated":{"selfHeal":false}}}}'
+          ## delete the secret
+          oc delete secret htpass-secret -n openshift-config
+          ## patch the oauth provider
+          oc patch oauth cluster --type=merge --patch '{"spec":{"identityProviders":null}}'
           ## Delete the tennant apps
           for wapp in welcome-dev welcome-prod welcome-pipeline
           do
