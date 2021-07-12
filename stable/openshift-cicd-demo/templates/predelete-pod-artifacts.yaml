@@ -29,6 +29,7 @@ spec:
           ## Delete the tennant apps
           for wapp in welcome-dev welcome-prod welcome-pipeline
           do
+            oc patch application ${wapp} -n welcome-gitops  -p '{"metadata": {"finalizers": []}}' --type merge
             oc delete application ${wapp} -n welcome-gitops
           done
           ## Delete the cluster application sets
