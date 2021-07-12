@@ -8,7 +8,7 @@ metadata:
   annotations:
     helm.sh/hook: pre-delete
     helm.sh/hook-delete-policy: hook-succeeded
-    helm.sh/hook-weight: "1"
+    helm.sh/hook-weight: "0"
 spec:
   containers:
     - name: deleter-cicd-artifacts
@@ -36,6 +36,7 @@ spec:
           ## Delete the cluster app
           for capp in tekton gitea argocd cluster-config
           do
+            oc patch application ${capp} -n openshift-gitops  -p '{"metadata": {"finalizers": []}}' --type merge
             oc delete application ${capp} -n openshift-gitops
           done
           ## Delete argocd instance

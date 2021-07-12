@@ -8,7 +8,7 @@ metadata:
   annotations:
     helm.sh/hook: pre-delete
     helm.sh/hook-delete-policy: hook-succeeded
-    helm.sh/hook-weight: "0"
+    helm.sh/hook-weight: "1"
 spec:
   containers:
     - name: deleter-cicd-demo
@@ -17,23 +17,11 @@ spec:
         - /bin/bash
         - -c
         - |
-          export HOME=/tmp/looper
-          counter=0
-          thresh=60
-          echo -n "Deleting OpenShift CICD Demo manifests"
-          until oc delete -k https://github.com/RedHatWorkshops/openshift-cicd-demo/bootstrap/overlays/base.cluster/ >>/tmp/looper.log 2>&1
-          do
-            if  [[ ${counter} -gt ${thresh} ]] ; then
-              echo -n "TIMEOUT! Dumping log:"
-              echo "---------------------"
-              cat /tmp/looper.log
-              exit 13
-            fi
-            counter=$(( counter + 1))
-            echo -n "."
-            sleep 5
-          done
+          export HOME=/tmp/deleter
+          echo -n "BEST EFFORT - Deleting OpenShift CICD Demo manifests..."
+          oc delete -k https://github.com/RedHatWorkshops/openshift-cicd-demo/bootstrap/overlays/base.cluster/ >>/tmp/looper.log 2>&1
           echo -e "DONE!\n"
+          exit 0
       imagePullPolicy: Always
   restartPolicy: Never
   serviceAccount: ocp-cicd-demo
