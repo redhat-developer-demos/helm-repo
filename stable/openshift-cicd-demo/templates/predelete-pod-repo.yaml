@@ -8,6 +8,7 @@ metadata:
   annotations:
     helm.sh/hook: pre-delete
     helm.sh/hook-delete-policy: hook-succeeded
+    helm.sh/hook-weight: "0"
 spec:
   containers:
     - name: deleter-cicd-demo

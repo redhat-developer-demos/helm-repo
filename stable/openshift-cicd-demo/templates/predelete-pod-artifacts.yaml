@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: openshift-cicd-artifact-deleter
+  namespace: ocp-cicd-deploy
+  labels:
+    {{- include "openshift-cicd-demo.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: pre-delete
+    helm.sh/hook-delete-policy: hook-succeeded
+    helm.sh/hook-weight: "1"
+spec:
+  containers:
+    - name: deleter-cicd-artifacts
+      image: quay.io/redhatworkshops/ocp-cicd-deploy:latest
+      command:
+        - /bin/bash
+        - -c
+        - |
+          export HOME=/tmp/looper
+          ## Delete the tennant apps
+          for wapp in welcome-dev welcome-prod welcome-pipeline
+          do
+            oc delete application ${wapp} -n welcome-gitops
+          done
+          ## Delete the cluster app
+          for capp in tekton gitea argocd cluster-config
+          do
+            oc delete application ${capp} -n openshift-gitops
+          done
+          ## Delete argocd instance
+          oc delete argocd welcome-argocd -n welcome-gitops
+          ## Delete namespaces
+          for ns in scm welcome-dev welcome-gitops welcome-pipeline welcome-prod
+          do
+            oc delete ns ${ns}
+          done
+          ## Delete operators
+          for op in gitea-operator.openshift-operators openshift-gitops-operator.openshift-operators openshift-pipelines-operator-rh.openshift-operators
+          do
+            oc delete operator ${op}
+          done
+          ## Exit 0 because we have to
+          exit 0
+      imagePullPolicy: Always
+  restartPolicy: Never
+  serviceAccount: ocp-cicd-demo
+  serviceAccountName: ocp-cicd-demo
