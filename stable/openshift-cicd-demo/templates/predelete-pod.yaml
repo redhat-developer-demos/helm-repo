@@ -36,9 +36,9 @@ spec:
       imagePullPolicy: Always
       env:
       - name: SLEEP
-        value: 5
+        value: "5"
       - name: THRESHOLD
-        value: 60
+        value: "60"
   restartPolicy: Never
   serviceAccount: ocp-cicd-demo
   serviceAccountName: ocp-cicd-demo
