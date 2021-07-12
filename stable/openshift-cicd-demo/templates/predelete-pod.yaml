@@ -18,7 +18,7 @@ spec:
         - |
           export HOME=/tmp/looper
           counter=0
-          thresh=${THRESHOLD:=12}
+          thresh=${THRESHOLD}
           echo -n "Deleting OpenShift CICD Demo manifests"
           until oc delete -k https://github.com/RedHatWorkshops/openshift-cicd-demo/bootstrap/overlays/base.cluster/ >>/tmp/looper.log 2>&1
           do
@@ -30,7 +30,7 @@ spec:
             fi
             counter=$(( counter + 1))
             echo -n "."
-            sleep ${SLEEP:=5}
+            sleep ${SLEEP}
           done
           echo -e "DONE!\n"
       imagePullPolicy: Always
