@@ -18,42 +18,55 @@ spec:
         - -c
         - |
           export HOME=/tmp/looper
-          ## oAuth is a bitch so we'll turn off
-          ## automatic sync and patch the servivce before we do anything else
+          ## oAuth is a bitch so we'll turn off automatic syncing
+          ## and patch the application/sets before we do anything else
           oc patch applicationsets cicd-demo -n openshift-gitops --type=json -p='[{"op": "replace", "path": "/spec/template/spec/syncPolicy/automated/selfHeal", "value":false}]'
           oc patch application cluster-config -n openshift-gitops --type=merge --patch '{"spec":{"syncPolicy":{"automated":{"selfHeal":false}}}}'
-          ## delete the secret
+          ## delete the htpass-secret
           oc delete secret htpass-secret -n openshift-config
-          ## patch the oauth provider
+          ## patch the oauth provider to have no idp
           oc patch oauth cluster --type=merge --patch '{"spec":{"identityProviders":null}}'
-          ## Delete the tennant apps
+          ## Delete the tennant argocd apps
           for wapp in welcome-dev welcome-prod welcome-pipeline
           do
             oc patch application ${wapp} -n welcome-gitops  -p '{"metadata": {"finalizers": []}}' --type merge
             oc delete application ${wapp} -n welcome-gitops
           done
-          ## Delete the cluster application sets
+          ## Delete the cluster argocd applicationsets
           oc delete applicationsets cicd-demo -n openshift-gitops
-          ## Delete the cluster app
+          ## Delete the cluster argocd application
           for capp in tekton gitea argocd cluster-config
           do
             oc patch application ${capp} -n openshift-gitops  -p '{"metadata": {"finalizers": []}}' --type merge
             oc delete application ${capp} -n openshift-gitops
           done
-          ## Delete argocd instance
+          ## Delete argocd tennant instance
           oc delete argocd welcome-argocd -n welcome-gitops
-          ## Delete namespaces
+          ## Delete namespaces. Don't wait for success
           for ns in scm welcome-dev welcome-gitops welcome-pipeline welcome-prod
           do
-            oc delete ns ${ns}
+            oc delete ns ${ns} --wait=false
+          done
+          ## Delete subs
+          for sub in $(oc get subs -n openshift-operators -o name | egrep 'gitops|pipelines|gitea')
+          do
+            oc delete sub ${sub} -n openshift-operators
+          done
+          ## Delete csv
+          for csv in $(oc get csv -n openshift-operators -o name | egrep 'gitops|pipelines|gitea')
+          do
+            oc delete csv ${csv} -n openshift-operators
           done
           ## Delete operators
           for op in gitea-operator.openshift-operators openshift-gitops-operator.openshift-operators openshift-pipelines-operator-rh.openshift-operators
           do
             oc delete operator ${op}
           done
+          ## Delete gitea catolog source
+          oc delete catalogsource $(oc get catalogsource -n openshift-marketplace -o name | grep gitea) -n openshift-marketplace
+          ## Finally, delete the gitops project
           oc delete project openshift-gitops
-          ## Exit 0 because we have to
+          ## Exit 0 regaurdless of what actually happend
           exit 0
       imagePullPolicy: Always
   restartPolicy: Never

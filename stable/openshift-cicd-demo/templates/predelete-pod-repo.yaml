@@ -18,7 +18,7 @@ spec:
         - -c
         - |
           export HOME=/tmp/deleter
-          echo -n "BEST EFFORT - Deleting OpenShift CICD Demo manifests..."
+          echo -n "BEST EFFORT - Deleting OpenShift CICD Demo dangling artifacts..."
           oc delete -k https://github.com/RedHatWorkshops/openshift-cicd-demo/bootstrap/overlays/base.cluster/ >>/tmp/looper.log 2>&1
           echo -e "DONE!\n"
           exit 0
