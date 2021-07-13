@@ -50,12 +50,12 @@ spec:
           ## Delete subs
           for sub in $(oc get subs -n openshift-operators -o name | egrep 'gitops|pipelines|gitea')
           do
-            oc delete sub ${sub} -n openshift-operators
+            oc delete ${sub} -n openshift-operators
           done
           ## Delete csv
           for csv in $(oc get csv -n openshift-operators -o name | egrep 'gitops|pipelines|gitea')
           do
-            oc delete csv ${csv} -n openshift-operators
+            oc delete ${csv} -n openshift-operators
           done
           ## Delete operators
           for op in gitea-operator.openshift-operators openshift-gitops-operator.openshift-operators openshift-pipelines-operator-rh.openshift-operators
@@ -63,7 +63,7 @@ spec:
             oc delete operator ${op}
           done
           ## Delete gitea catolog source
-          oc delete catalogsource $(oc get catalogsource -n openshift-marketplace -o name | grep gitea) -n openshift-marketplace
+          oc delete $(oc get catalogsource -n openshift-marketplace -o name | grep gitea) -n openshift-marketplace
           ## Finally, delete the gitops project
           oc delete project openshift-gitops
           ## Exit 0 regaurdless of what actually happend
