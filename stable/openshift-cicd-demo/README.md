@@ -73,6 +73,9 @@ The following table lists the configurable parameters and the default values.
 | ----------| ----------- | ------- |
 | `timeoutoptions.sleep`  | How long to sleep between failures   | `5` |
 | `timeoutoptions.threshold` | Maximum itterations to try before giving up | `60` |
+| `demo.repo` | The repo path to deploy | `https://github.com/RedHatWorkshops/openshift-cicd-demo/bootstrap/overlays/base.cluster/` |
+
+> :rotating_light: **NOTE** The helm chart "blindly" deploys the repo. So "fork and deploy" using `demo.repo` at your own risk.
 
 # Limitations
 

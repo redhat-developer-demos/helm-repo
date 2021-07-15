@@ -17,7 +17,7 @@ spec:
           counter=0
           thresh=${THRESHOLD:=12}
           echo -n "Applying OpenShift CICD Demo manifests"
-          until oc apply -k https://github.com/RedHatWorkshops/openshift-cicd-demo/bootstrap/overlays/base.cluster/ >>/tmp/looper.log 2>&1
+          until oc apply -k ${REPO} >>/tmp/looper.log 2>&1
           do
             if  [[ ${counter} -gt ${thresh} ]] ; then
               echo -n "TIMEOUT! Dumping log:"
@@ -36,6 +36,8 @@ spec:
         value: "{{ .Values.timeoutoptions.sleep }}"
       - name: THRESHOLD
         value: "{{ .Values.timeoutoptions.threshold }}"
+      - name: REPO
+        value: "{{ .Values.demo.repo }}"
   restartPolicy: Never
   serviceAccount: ocp-cicd-demo
   serviceAccountName: ocp-cicd-demo

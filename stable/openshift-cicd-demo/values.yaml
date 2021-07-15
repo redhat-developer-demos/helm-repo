@@ -1,3 +1,5 @@
 timeoutoptions:
   sleep: 5
   threshold: 60
+demo:
+  repo: "https://github.com/RedHatWorkshops/openshift-cicd-demo/bootstrap/overlays/base.cluster/"
