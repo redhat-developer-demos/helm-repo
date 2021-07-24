@@ -14,6 +14,7 @@ spec:
         - -c
         - |
           export HOME=/tmp/looper
+          #
           ## This is temporary to avoid this ~> https://github.com/argoproj-labs/applicationset/issues/219
           echo "Applying OpenShift GitOps Subscription"
           echo "======================================"
@@ -22,6 +23,10 @@ spec:
           echo "Waiting for OpenShift GitOps Pods to appear"
           echo "==========================================="
           until oc get pods -n openshift-gitops >/dev/null 2>&1 ; do sleep 5; done; echo "DONE"
+          echo "Waiting for OpenShift GitOps server rollout"
+          echo "==========================================="
+          oc rollout status deploy/openshift-gitops-server -n openshift-gitops
+          #
           ## Apply the demo repo
           counter=0
           thresh=${THRESHOLD:=12}
