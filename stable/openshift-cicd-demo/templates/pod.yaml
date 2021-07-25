@@ -25,7 +25,9 @@ spec:
           until oc get pods -n openshift-gitops >/dev/null 2>&1 ; do sleep 5; done; echo "DONE"
           echo "Waiting for OpenShift GitOps server rollout"
           echo "==========================================="
+          oc rollout status sts/openshift-gitops-application-controller -n openshift-gitops
           oc rollout status deploy/openshift-gitops-server -n openshift-gitops
+          ## END TEMP
           #
           ## Apply the demo repo
           counter=0

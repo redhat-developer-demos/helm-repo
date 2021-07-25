@@ -3,7 +3,7 @@ entries:
   netcandystore:
   - apiVersion: v2
     appVersion: "4.6"
-    created: "2021-07-24T11:02:04.891112728-07:00"
+    created: "2021-07-25T10:45:45.178699228-07:00"
     description: NetCandyStore deploys a sample CRUD application that uses both Windows
       Conatianers and Linux containers.
     digest: 611a82bd3ff4364894ab93971a5198b4a15d27c69b3401bb64d6ee11f3e54981
@@ -16,24 +16,13 @@ entries:
   openshift-cicd-demo:
   - apiVersion: v2
     appVersion: 1.0.1
-    created: "2021-07-24T11:02:04.891766309-07:00"
+    created: "2021-07-25T10:45:45.179612963-07:00"
     description: This deploys the OpenShift CICD Demo that uses Argo CD and Tekton
-    digest: 1b3303a3be2febb8a78781668a3d35a944519408426bbe6a90e89cdbd381a193
+    digest: 72dede322ab205d18dc3a175452921a4464122ac58564d9e311c80a5fdfdbb98
     icon: http://people.redhat.com/chernand/openshift-gitops.png
     name: openshift-cicd-demo
     type: application
     urls:
-    - https://redhat-developer-demos.github.io/helm-repo/charts/openshift-cicd-demo-0.1.15.tgz
-    version: 0.1.15
-  - apiVersion: v2
-    appVersion: 1.0.1
-    created: "2021-07-24T11:02:04.891441936-07:00"
-    description: This deploys the OpenShift CICD Demo that uses Argo CD and Tekton
-    digest: 76b118bfd666303ac2bbfd7833e2cfa86204fd6250461949e23b064806e249c5
-    icon: http://people.redhat.com/chernand/openshift-gitops.png
-    name: openshift-cicd-demo
-    type: application
-    urls:
-    - https://redhat-developer-demos.github.io/helm-repo/charts/openshift-cicd-demo-0.1.14.tgz
-    version: 0.1.14
-generated: "2021-07-24T11:02:04.890607604-07:00"
+    - https://redhat-developer-demos.github.io/helm-repo/charts/openshift-cicd-demo-0.1.16.tgz
+    version: 0.1.16
+generated: "2021-07-25T10:45:45.178183627-07:00"
