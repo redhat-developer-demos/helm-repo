@@ -53,26 +53,25 @@ Please view the [offical OpenShift docs](https://docs.openshift.com/container-pl
 
 Users installing this chart must have Cluster Administrator permissions.
 
-Once you've verified you are a cluster admin, you need to extract some
-information. You will need the hostname of the Windows node installed
-and the ssh-key used to login to the Windows Node.
-
-> The Helm Chart deploys a Job that downloads the image of the frontend
-> application as a pre-deploy task. This is a requirement.
+First create and label the namespace used by the help chart:
 
 ```shell
-export WSSHKEY=$(oc get secret cloud-private-key -n openshift-windows-machine-config-operator -o jsonpath='{.data.private-key\.pem}')
-export WNODE=$(oc get nodes -l kubernetes.io/os=windows -o jsonpath='{.items[0].metadata.name}')
+oc create namespace netcandystore
+oc label --overwrite namespace netcandystore \
+pod-security.kubernetes.io/enforce=privileged \
+pod-security.kubernetes.io/warn=baseline \
+pod-security.kubernetes.io/audit=baseline \
+security.openshift.io/scc.podSecurityLabelSync=false
 ```
 
-With the two variables exported, you can install the you can install
-the chart with the release name `ncs`:
+The labels are required as the application runs with `ContainerAdministrator`
+user and that requires elevated privileges. You can now install the chart with
+the release name `ncs`:
 
 ```shell
 helm install ncs --namespace netcandystore \
---create-namespace --timeout=1200s \
-redhat-demos/netcandystore \
---set ssh.hostkey=${WSSHKEY} --set ssh.hostname=${WNODE}
+--timeout=1200s \
+redhat-demos/netcandystore
 ```
 
 # Uninstalling the Chart
@@ -89,9 +88,6 @@ The following table lists the configurable parameters and the default values.
 
 | Parameter | Description | Default |
 | ----------| ----------- | ------- |
-| `ssh.username`  | The username used to ssh into the Windows node   | `administrator` |
-| `ssh.hostname`  | **REQUIRED** - The hostname or IP of the Windows node | `null` |
-| `ssh.hostkey`  | **REQUIRED** - A base64 encoded version of the key used to ssh into the Windows Node. | `null` |
 | `netcandy.image` | Image to use for the Netcandy store backend .NET application | `quay.io/donschenck/netcandystore:2021mar8.1` |
 | `netcandy.dbpassword` | Password to set for the database | `reallylongpassword99!` |
 | `netcandy.dbstorage` | Storage size for the database | `1Gi` |

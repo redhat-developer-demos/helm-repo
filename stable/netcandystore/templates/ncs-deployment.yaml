@@ -21,6 +21,8 @@ spec:
         app: netcandystore
       name: netcandystore
     spec:
+      os:
+        name: "windows"
       tolerations:
       - key: "os"
         value: "Windows"
@@ -36,4 +38,4 @@ spec:
           windowsOptions:
             runAsUserName: "ContainerAdministrator"
       nodeSelector:
-        beta.kubernetes.io/os: windows
+        kubernetes.io/os: windows
