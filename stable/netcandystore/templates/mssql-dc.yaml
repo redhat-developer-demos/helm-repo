@@ -14,10 +14,9 @@ spec:
     type: Recreate
   template:
     metadata:
-      name: mssql
 #      {{- with .Values.podAnnotations }}
-      annotation:
-        {{- toYaml . | nindent 8 }}
+#      annotation:
+#        {{- toYaml . | nindent 8 }}
       labels:
         {{- include "netcandystore.selectorLabels" . | nindent 8 }}
         name: mssql
