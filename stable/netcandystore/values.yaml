@@ -6,7 +6,7 @@ ssh:
 netcandy:
   image: "quay.io/donschenck/netcandystore:2021mar8.1"
   dbpassword: "reallylongpassword99!"
-  dbstorage: "1Gi"
+  dbstorage: "8Gi"
   dbimage: "mcr.microsoft.com/mssql/rhel/server:2019-CU1-rhel-8"
 
 frontend:
