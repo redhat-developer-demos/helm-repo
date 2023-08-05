@@ -14,66 +14,71 @@ spec:
     type: Recreate
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
-      annotations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      name: mssql
+#      {{- with .Values.podAnnotations }}
+#      annotations:
+#        {{- toYaml . | nindent 8 }}
+#      {{- end }}
       labels:
         {{- include "netcandystore.selectorLabels" . | nindent 8 }}
-        name: mssql
-      name: mssql
     spec:
+      terminationGracePeriodSeconds: 10
+      securityContext:
+        fsGroup: 10001
+      volumes:
+        - name: mssql-data
+          persistentVolumeClaim:
+            claimName: mssql-pvc
+        - name: tempdir
+          emptyDir: {}
+      initContainers:
+        - name: csv-downloader
+          image: registry.access.redhat.com/ubi8/ubi:latest
+          command:
+            - /bin/bash
+            - -c
+            - |
+              url=${URLPREFIX}
+              csvfiles=(StatusCodes.csv ProductCategories.csv Products.csv)
+              echo "Downloading CSV files"
+              echo "====================="
+              for csvfile in ${csvfiles[@]}
+              do
+                curl ${url}/${csvfile} --output /tmp/${csvfile}
+                chmod 777 /tmp/${csvfile}
+              done
+          env:
+            - name: URLPREFIX
+              value: "https://raw.githubusercontent.com/DonSchenck/NetCandyStore/main"
+          resources: {}
+          volumeMounts:
+            - name: tempdir
+              mountPath: /tmp
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: Always
       containers:
-      - env:
-        - name: ACCEPT_EULA
-          value: "Y"
-        - name: MSSQL_PID
-          value: Developer
-        - name: SA_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              key: SA_PASSWORD
-              name: mssql-secret
-        - name: MSSQL_SERVICE
-          valueFrom:
-            secretKeyRef:
-              key: SERVICE_NAME
-              name: mssql-secret
-        image: {{ .Values.netcandy.dbimage }}
-        name: mssql
+      - name: mssql
+        image:  {{ .Values.netcandy.dbimage }}
         ports:
         - containerPort: 1433
-        volumeMounts:
-        - mountPath: /var/opt/mssql
-          name: mssql-data
-        - mountPath: /tmp
-          name: tempdir
-      initContainers:
-      - name: csv-downloader
-        image: registry.access.redhat.com/ubi8/ubi:latest
         env:
-        - name: URLPREFIX
-          value: "https://raw.githubusercontent.com/DonSchenck/NetCandyStore/main"
-        command:
-        - /bin/bash
-        - -c
-        - |
-          url=${URLPREFIX}
-          csvfiles=(StatusCodes.csv ProductCategories.csv Products.csv)
-          echo "Downloading CSV files"
-          echo "====================="
-          for csvfile in ${csvfiles[@]}
-          do
-            curl ${url}/${csvfile} --output /tmp/${csvfile}
-            chmod 777 /tmp/${csvfile}
-          done
-        imagePullPolicy: Always
+          - name: ACCEPT_EULA
+            value: 'Y'
+          - name: MSSQL_PID
+            value: Developer
+          - name: SA_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mssql-secret
+                key: SA_PASSWORD
+          - name: MSSQL_SERVICE
+            valueFrom:
+              secretKeyRef:
+                name: mssql-secret
+                key: SERVICE_NAME
         volumeMounts:
-        - mountPath: /tmp
-          name: tempdir
-      volumes:
-      - name: mssql-data
-        persistentVolumeClaim:
-          claimName: mssql-pvc
-      - name: tempdir
-        emptyDir: {}
+        - name: mssql-data
+          mountPath: /var/opt/mssql
+        - name: tempdir
+          mountPath: /tmp
