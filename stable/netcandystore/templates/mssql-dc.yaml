@@ -21,6 +21,8 @@ spec:
       {{- end }}
       labels:
         {{- include "netcandystore.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/instance: ncs
+        app.kubernetes.io/name: netcandystore
     spec:
       terminationGracePeriodSeconds: 10
       securityContext:
