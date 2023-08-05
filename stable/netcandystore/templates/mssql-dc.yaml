@@ -15,10 +15,10 @@ spec:
   template:
     metadata:
       name: mssql
-#      {{- with .Values.podAnnotations }}
-#      annotations:
-#        {{- toYaml . | nindent 8 }}
-#      {{- end }}
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       labels:
         {{- include "netcandystore.selectorLabels" . | nindent 8 }}
     spec:
