@@ -19,7 +19,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       labels:
         {{- include "netcandystore.selectorLabels" . | nindent 8 }}
-        name: mssql
+      name: mssql
     spec:
       terminationGracePeriodSeconds: 10
       securityContext:
