@@ -4,11 +4,7 @@ metadata:
   name: mssql
   namespace: netcandystore
   labels:
-    app.kubernetes.io/instance: ncs
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: netcandystore
-    app.kubernetes.io/version: '4.6'
-    helm.sh/chart: netcandystore-1.0.3
+    {{- include "netcandystore.labels" . | nindent 4 }}
   annotations:
     description: Defines how to deploy the database server
     meta.helm.sh/release-name: ncs

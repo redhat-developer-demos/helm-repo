@@ -90,8 +90,8 @@ The following table lists the configurable parameters and the default values.
 | ----------| ----------- | ------- |
 | `netcandy.image` | Image to use for the Netcandy store backend .NET application | `quay.io/donschenck/netcandystore:2021mar8.1` |
 | `netcandy.dbpassword` | Password to set for the database | `reallylongpassword99!` |
-| `netcandy.dbstorage` | Storage size for the database | `1Gi` |
-| `netcandy.dbimage` | Image to use for the MSSQL Database | `mcr.microsoft.com/mssql/rhel/server:2019-latest` |
+| `netcandy.dbstorage` | Storage size for the database | `8Gi` |
+| `netcandy.dbimage` | Image to use for the MSSQL Database | `mcr.microsoft.com/mssql/rhel/server:2019-CU1-rhel-8` |
 | `frontend.replicas` | The amount of frontend replicas to run | `1` |
 | `backend.replicas` | The amount of backend replicas to run | `1` |
 | `route.enabled` | Create a route for the application | `true` |
