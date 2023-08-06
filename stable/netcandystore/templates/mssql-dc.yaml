@@ -1,11 +1,18 @@
-apiVersion: apps.openshift.io/v1
 kind: DeploymentConfig
+apiVersion: apps.openshift.io/v1
 metadata:
+  name: mssql
+  namespace: netcandystore
+  labels:
+    app.kubernetes.io/instance: ncs
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: netcandystore
+    app.kubernetes.io/version: '4.6'
+    helm.sh/chart: netcandystore-1.0.3
   annotations:
     description: Defines how to deploy the database server
-  name: mssql
-  labels:
-    {{- include "netcandystore.labels" . | nindent 4 }}
+    meta.helm.sh/release-name: ncs
+    meta.helm.sh/release-namespace: netcandystore
 spec:
   replicas: 1
   selector:
@@ -15,71 +22,68 @@ spec:
   template:
     metadata:
       name: mssql
-      {{- with .Values.podAnnotations }}
-      annotations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
       labels:
         name: mssql
-        {{- include "netcandystore.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/instance: ncs
+        app.kubernetes.io/name: netcandystore
     spec:
       terminationGracePeriodSeconds: 10
       securityContext:
         fsGroup: 10001
-      volumes:
-        - name: mssql-data
-          persistentVolumeClaim:
-            claimName: mssql-pvc
-        - name: tempdir
-          emptyDir: {}
       initContainers:
-        - name: csv-downloader
-          image: registry.access.redhat.com/ubi8/ubi:latest
-          command:
-            - /bin/bash
-            - -c
-            - |
-              url=${URLPREFIX}
-              csvfiles=(StatusCodes.csv ProductCategories.csv Products.csv)
-              echo "Downloading CSV files"
-              echo "====================="
-              for csvfile in ${csvfiles[@]}
-              do
-                curl ${url}/${csvfile} --output /tmp/${csvfile}
-                chmod 777 /tmp/${csvfile}
-              done
-          env:
-            - name: URLPREFIX
-              value: "https://raw.githubusercontent.com/DonSchenck/NetCandyStore/main"
-          resources: {}
-          volumeMounts:
-            - name: tempdir
-              mountPath: /tmp
-          terminationMessagePath: /dev/termination-log
-          terminationMessagePolicy: File
-          imagePullPolicy: Always
+      - name: csv-downloader
+        image: 'registry.access.redhat.com/ubi8/ubi:latest'
+        command:
+          - /bin/bash
+          - '-c'
+          - |
+            url=${URLPREFIX}
+            csvfiles=(StatusCodes.csv ProductCategories.csv Products.csv)
+            echo "Downloading CSV files"
+            echo "====================="
+            for csvfile in ${csvfiles[@]}
+            do
+              curl ${url}/${csvfile} --output /tmp/${csvfile}
+              chmod 777 /tmp/${csvfile}
+            done
+        env:
+        - name: URLPREFIX
+          value: 'https://raw.githubusercontent.com/DonSchenck/NetCandyStore/main'
+        resources: {}
+        volumeMounts:
+        - name: tempdir
+          mountPath: /tmp
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        imagePullPolicy: Always
       containers:
       - name: mssql
-        image:  {{ .Values.netcandy.dbimage }}
+        image: mcr.microsoft.com/mssql/rhel/server:2019-CU1-rhel-8
         ports:
         - containerPort: 1433
         env:
-          - name: ACCEPT_EULA
-            value: 'Y'
-          - name: MSSQL_PID
-            value: Developer
-          - name: SA_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: mssql-secret
-                key: SA_PASSWORD
-          - name: MSSQL_SERVICE
-            valueFrom:
-              secretKeyRef:
-                name: mssql-secret
-                key: SERVICE_NAME
+        - name: ACCEPT_EULA
+          value: 'Y'
+        - name: MSSQL_PID
+          value: Developer
+        - name: SA_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mssql-secret
+              key: SA_PASSWORD
+        - name: MSSQL_SERVICE
+          valueFrom:
+            secretKeyRef:
+              name: mssql-secret
+              key: SERVICE_NAME
         volumeMounts:
         - name: mssql-data
           mountPath: /var/opt/mssql
         - name: tempdir
           mountPath: /tmp
+      volumes:
+      - name: mssql-data
+        persistentVolumeClaim:
+          claimName: mssql-pvc
+      - name: tempdir
+        emptyDir: {}
