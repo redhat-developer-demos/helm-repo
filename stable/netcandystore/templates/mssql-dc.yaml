@@ -17,11 +17,14 @@ spec:
     type: Recreate
   template:
     metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       name: mssql
       labels:
+        {{- include "netcandystore.selectorLabels" . | nindent 8 }}
         name: mssql
-        app.kubernetes.io/instance: ncs
-        app.kubernetes.io/name: netcandystore
     spec:
       terminationGracePeriodSeconds: 10
       securityContext:
@@ -54,7 +57,7 @@ spec:
         imagePullPolicy: Always
       containers:
       - name: mssql
-        image: mcr.microsoft.com/mssql/rhel/server:2019-CU1-rhel-8
+        image: {{ .Values.netcandy.dbimage }}
         ports:
         - containerPort: 1433
         env:
